@@ -3,9 +3,19 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
+/**
+ * Simple program teaching typing on a keyboard. Reads text from input file line by line, after each line user must type in the exact line.
+ * If user input is incorrect, program returns information about the mistake position and what should be a correct character.
+ */
 public class KeyboardTeacher {
     private Scanner userInputScanner = new Scanner(System.in);
 
+    /**
+     * Teaches user typing after reading each line from the input file. Compares user input with the given line from file and checks for mistakes.
+     *
+     * @param fileName Name of the input file containing text to be taught.
+     * @throws IOException When something goes wrong with reading the input file.
+     */
     public void teach(String fileName) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
         compareFileLineWithUserInput(bufferedReader);
