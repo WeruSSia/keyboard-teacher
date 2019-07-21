@@ -4,8 +4,11 @@ import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemOutRule;
 import org.junit.contrib.java.lang.system.TextFromStandardInputStream;
 
-import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.contrib.java.lang.system.TextFromStandardInputStream.emptyStandardInputStream;
@@ -16,18 +19,16 @@ public class KeyboardTeacherTest {
     private String firstLineToBeTaught;
     private String secondLineToBeTaught;
     private String inputFileContent;
-    private String fileName;
+    private File inputFile;
 
     @Before
     public void setUp() throws IOException {
         keyboardTeacher = new KeyboardTeacher();
-        firstLineToBeTaught = "This is the first line.";
-        secondLineToBeTaught = "This is the second line.";
+        inputFile = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("inputFile.txt")).getFile());
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(inputFile));
+        firstLineToBeTaught = bufferedReader.readLine();
+        secondLineToBeTaught = bufferedReader.readLine();
         inputFileContent = firstLineToBeTaught + "\n" + secondLineToBeTaught + "\n";
-        fileName = "inputFile.txt";
-        FileWriter fileWriter = new FileWriter(fileName);
-        fileWriter.write(inputFileContent);
-        fileWriter.close();
     }
 
     @Rule
@@ -41,7 +42,7 @@ public class KeyboardTeacherTest {
 
         systemInMock.provideLines(firstLineToBeTaught, secondLineToBeTaught);
 
-        keyboardTeacher.teach(fileName);
+        keyboardTeacher.teach(inputFile.toString());
 
         assertEquals("\r\nCongratulations!\r\n", systemOutRule.getLog().substring(inputFileContent.length()));
     }
@@ -49,21 +50,21 @@ public class KeyboardTeacherTest {
     @Test
     public void teach_lineTooShort() throws IOException {
         systemInMock.provideLines("This is th", firstLineToBeTaught, secondLineToBeTaught);
-        keyboardTeacher.teach(fileName);
+        keyboardTeacher.teach(inputFile.toString());
         assertEquals("\r\nMistake on position 11. Given line is too short. You should type in \'e\' char now. Try again!", systemOutRule.getLog().substring(firstLineToBeTaught.length(), systemOutRule.getLog().length() - inputFileContent.length() - firstLineToBeTaught.length() + 1));
     }
 
     @Test
     public void teach_lineTooLong() throws IOException {
         systemInMock.provideLines("This is the first line..", firstLineToBeTaught, secondLineToBeTaught);
-        keyboardTeacher.teach(fileName);
+        keyboardTeacher.teach(inputFile.toString());
         assertEquals("\r\nMistake on position 24. Given line is too long. Try again!", systemOutRule.getLog().substring(firstLineToBeTaught.length(), systemOutRule.getLog().length() - inputFileContent.length() - firstLineToBeTaught.length() + 1));
     }
 
     @Test
     public void teach_mistake() throws IOException {
         systemInMock.provideLines("Thus is the first line.", firstLineToBeTaught, secondLineToBeTaught);
-        keyboardTeacher.teach(fileName);
+        keyboardTeacher.teach(inputFile.toString());
         assertEquals("\r\nMistake on position 3. You typed in \'u\' char instead of \'i\' char. Try again!", systemOutRule.getLog().substring(firstLineToBeTaught.length(), systemOutRule.getLog().length() - inputFileContent.length() - firstLineToBeTaught.length() + 1));
     }
 }
