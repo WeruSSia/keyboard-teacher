@@ -7,8 +7,9 @@ import java.util.Scanner;
  * Simple program teaching typing on a keyboard. Reads text from input file line by line, after each line user must type in the exact line.
  * If user input is incorrect, program returns information about the mistake position and what should be a correct character.
  */
+@SuppressWarnings("WeakerAccess")
 public class KeyboardTeacher {
-    private Scanner userInputScanner = new Scanner(System.in);
+    private final Scanner userInputScanner = new Scanner(System.in);
 
     /**
      * Teaches user typing after reading each line from the input file. Compares user input with the given line from file and checks for mistakes.
